@@ -1,11 +1,11 @@
 import { Router } from "express";
 import { z } from "zod";
-import { prisma } from "../db.js";
-import { requiereAuth } from "../middleware/auth.js";
-import { esDominioValido, resolverIpPublica } from "../lib/seguridad.js";
-import { revisarCertificado } from "../integrations/tls.js";
-import { descubrirSubdominios } from "../integrations/crtsh.js";
-import { calcularPuntaje, nivelDePuntaje } from "../domain/puntaje.js";
+import { prisma } from "../../db.js";
+import { requiereAuth } from "../../middleware/auth.js";
+import { esDominioValido, resolverIpPublica } from "../../lib/seguridad.js";
+import { revisarCertificado } from "../../integrations/tls.js";
+import { descubrirSubdominios } from "../../integrations/crtsh.js";
+import { calcularPuntaje, nivelDePuntaje } from "../../domain/puntaje.js";
 
 const router = Router();
 router.use(requiereAuth);

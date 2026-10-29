@@ -2,7 +2,7 @@ import { Router } from "express";
 import argon2 from "argon2";
 import jwt from "jsonwebtoken";
 import { z } from "zod";
-import { prisma } from "../db.js";
+import { prisma } from "../../db.js";
 
 const router = Router();
 
