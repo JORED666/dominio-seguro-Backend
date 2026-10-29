@@ -1,0 +1,59 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Usuario {
+  id           String    @id @default(uuid())
+  nombre       String
+  correo       String    @unique
+  passwordHash String    @map("password_hash")
+  rol          String    @default("usuario")
+  creadoEn     DateTime  @default(now()) @map("creado_en")
+  dominios     Dominio[]
+
+  @@map("usuarios")
+}
+
+model Dominio {
+  id            String     @id @default(uuid())
+  usuarioId     String     @map("usuario_id")
+  nombreDominio String     @map("nombre_dominio")
+  ultimoPuntaje Int?       @map("ultimo_puntaje")
+  creadoEn      DateTime   @default(now()) @map("creado_en")
+  usuario       Usuario    @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  analisis      Analisis[]
+
+  @@unique([usuarioId, nombreDominio])
+  @@map("dominios")
+}
+
+model Analisis {
+  id         String     @id @default(uuid())
+  dominioId  String     @map("dominio_id")
+  fecha      DateTime   @default(now())
+  puntaje    Int
+  duracionMs Int        @map("duracion_ms")
+  dominio    Dominio    @relation(fields: [dominioId], references: [id], onDelete: Cascade)
+  hallazgos  Hallazgo[]
+
+  @@index([dominioId, fecha])
+  @@map("analisis")
+}
+
+model Hallazgo {
+  id            String   @id @default(uuid())
+  analisisId    String   @map("analisis_id")
+  categoria     String
+  severidad     String
+  titulo        String
+  descripcion   String
+  recomendacion String
+  analisis      Analisis @relation(fields: [analisisId], references: [id], onDelete: Cascade)
+
+  @@map("hallazgos")
+}
