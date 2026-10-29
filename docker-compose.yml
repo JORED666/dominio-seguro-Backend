@@ -1,3 +1,4 @@
+name: dominio-seguro
 services:
   db:
     image: postgres:16
