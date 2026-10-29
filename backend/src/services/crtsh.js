@@ -9,6 +9,7 @@ export async function descubrirSubdominios(dominio, maximo = 20) {
   for (const cert of certificados) {
     for (const nombre of cert.name_value.split("\n")) {
       const limpio = nombre.trim().toLowerCase();
+      if (!/^[a-z0-9.-]+$/.test(limpio)) continue;
       if (!limpio.startsWith("*") && limpio !== dominio) nombres.add(limpio);
     }
   }
