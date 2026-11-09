@@ -1,6 +1,6 @@
 // Puntaje PROVISIONAL del avance: parte de 100 y resta según los hallazgos.
 // Más adelante se reemplaza por el sistema de categorías y pesos de la propuesta.
-export function calcularPuntaje({ cert, subdominios, errorCrt }) {
+export function calcularPuntaje({ cert, subdominios, errorCrt, reputacion, errorReputacion, exposicion, errorExposicion }) {
   let puntaje = 100;
   let hayCritico = false;
   const hallazgos = [];
@@ -71,6 +71,59 @@ export function calcularPuntaje({ cert, subdominios, errorCrt }) {
     );
   } else {
     agregar("Subdominios", "info", `Se encontraron ${subdominios.length} subdominios`, "Cantidad razonable.", "Sin acción necesaria.");
+  }
+
+  // --- Reputación de la IP (IP Score API) ---
+  if (errorReputacion) {
+    agregar("Reputación", "info", "No se pudo consultar la reputación de la IP",
+      "El servicio de reputación no respondió.", "Intenta el análisis de nuevo más tarde.");
+  } else if (reputacion) {
+    const f = reputacion.flags || {};
+    if (f.is_botnet_c2) {
+      agregar("Reputación", "critica", "La IP figura como servidor de control de botnet",
+        "La IP del sitio aparece en listas de Abuse.ch como servidor C2 activo.",
+        "Revisa el servidor de inmediato: puede estar comprometido.", 60);
+    } else if (f.is_abuse_listed || reputacion.risk_score >= 60) {
+      agregar("Reputación", "alta", "La IP aparece en listas de abuso",
+        "La IP del sitio está en listas públicas de amenazas (Spamhaus, FireHOL u otras).",
+        "Investiga el origen del reporte y solicita la baja de la lista una vez corregido.", 30);
+    } else if (f.is_tor || f.is_proxy) {
+      agregar("Reputación", "media", "La IP está asociada a proxy o red Tor",
+        "Las IP anónimas suelen estar bloqueadas por servicios de seguridad.",
+        "Verifica que el sitio no se aloje en un proxy abierto.", 15);
+    } else {
+      const aloja = f.is_datacenter ? " La IP pertenece a un proveedor de nube/datacenter, lo cual es normal." : "";
+      agregar("Reputación", "info", "La IP no tiene mala reputación conocida",
+        `No aparece en las listas de amenazas consultadas.${aloja}`, "Sin acción necesaria.");
+    }
+  }
+
+  // --- Exposición de servicios (Shodan InternetDB) ---
+  if (errorExposicion) {
+    agregar("Exposición", "info", "No se pudo consultar la exposición de servicios",
+      "InternetDB no respondió o se alcanzó su límite de uso.", "Intenta el análisis de nuevo más tarde.");
+  } else if (exposicion) {
+    const PELIGROSOS = { 21: "FTP", 23: "Telnet", 445: "SMB", 1433: "SQL Server", 3306: "MySQL",
+      3389: "Escritorio remoto", 5432: "PostgreSQL", 5900: "VNC", 6379: "Redis", 9200: "Elasticsearch",
+      11211: "Memcached", 27017: "MongoDB" };
+    const expuestos = (exposicion.ports || []).filter((p) => PELIGROSOS[p]);
+    if (expuestos.length) {
+      const lista = expuestos.map((p) => `${p} (${PELIGROSOS[p]})`).join(", ");
+      agregar("Exposición", "alta", "Servicios sensibles expuestos a internet",
+        `Se detectaron puertos que normalmente no deben ser públicos: ${lista}.`,
+        "Cierra estos puertos en el firewall o limítalos a IP de confianza.", Math.min(30, expuestos.length * 15));
+    }
+    const cves = exposicion.vulns || [];
+    if (cves.length) {
+      agregar("Exposición", "alta", `${cves.length} vulnerabilidades conocidas asociadas`,
+        `Shodan asocia a esta IP: ${cves.slice(0, 5).join(", ")}${cves.length > 5 ? "…" : ""}.`,
+        "Actualiza el software de los servicios expuestos.", 20);
+    }
+    if (!expuestos.length && !cves.length) {
+      agregar("Exposición", "info", "Sin servicios sensibles ni vulnerabilidades detectadas",
+        exposicion.sinDatos ? "Shodan no tiene datos de esta IP." : `Puertos visibles: ${(exposicion.ports || []).join(", ") || "ninguno"}.`,
+        "Sin acción necesaria.");
+    }
   }
 
   puntaje = Math.max(0, Math.min(100, puntaje));

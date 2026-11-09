@@ -1,6 +1,8 @@
+name: dominio-seguro
 services:
   db:
     image: postgres:16
+    restart: unless-stopped
     environment:
       POSTGRES_USER: dominio
       POSTGRES_PASSWORD: dominio_dev
