@@ -5,6 +5,8 @@ import { requiereAuth } from "../../middleware/auth.js";
 import { esDominioValido, resolverIpPublica } from "../../lib/seguridad.js";
 import { revisarCertificado } from "../../integrations/tls.js";
 import { descubrirSubdominios } from "../../integrations/crtsh.js";
+import { consultarReputacion } from "../../integrations/ipscore.js";
+import { consultarExposicion } from "../../integrations/internetdb.js";
 import { calcularPuntaje, nivelDePuntaje } from "../../domain/puntaje.js";
 
 const router = Router();
@@ -61,16 +63,24 @@ router.post("/:id/analizar", async (req, res) => {
     return res.status(400).json({ error: err.message });
   }
 
-  const [resCert, resCrt] = await Promise.allSettled([
+  const [resCert, resCrt, resRep, resExp] = await Promise.allSettled([
     revisarCertificado(ip, host),
     descubrirSubdominios(host),
+    consultarReputacion(ip),
+    consultarExposicion(ip),
   ]);
 
   const cert = resCert.status === "fulfilled" ? resCert.value : null;
   const subdominios = resCrt.status === "fulfilled" ? resCrt.value : [];
   const errorCrt = resCrt.status === "rejected";
+  const reputacion = resRep.status === "fulfilled" ? resRep.value : null;
+  const errorReputacion = resRep.status === "rejected";
+  const exposicion = resExp.status === "fulfilled" ? resExp.value : null;
+  const errorExposicion = resExp.status === "rejected";
 
-  const { puntaje, hallazgos } = calcularPuntaje({ cert, subdominios, errorCrt });
+  const { puntaje, hallazgos } = calcularPuntaje({
+    cert, subdominios, errorCrt, reputacion, errorReputacion, exposicion, errorExposicion,
+  });
 
   const analisis = await prisma.analisis.create({
     data: {
@@ -83,7 +93,14 @@ router.post("/:id/analizar", async (req, res) => {
   });
   await prisma.dominio.update({ where: { id: dominio.id }, data: { ultimoPuntaje: puntaje } });
 
-  res.status(201).json({ ...analisis, nivel: nivelDePuntaje(puntaje), certificado: cert, subdominios });
+  res.status(201).json({
+    ...analisis,
+    nivel: nivelDePuntaje(puntaje),
+    certificado: cert,
+    subdominios,
+    reputacion: reputacion && { riesgo: reputacion.risk_score, nivel: reputacion.risk_level, asn: reputacion.network?.asn_org },
+    exposicion: exposicion && { puertos: exposicion.ports, vulnerabilidades: exposicion.vulns },
+  });
 });
 
 // Historial de análisis de un dominio
