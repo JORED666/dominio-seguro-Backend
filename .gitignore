@@ -2,3 +2,11 @@ node_modules/
 .env
 dist/
 .angular/
+
+# Llaves y certificados
+*.pem
+*.key
+id_rsa*
+id_ed25519*
+.env.*
+!.env.example
