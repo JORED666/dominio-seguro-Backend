@@ -16,7 +16,7 @@ const PUERTOS_PELIGROSOS = {
   5432: "PostgreSQL", 5900: "VNC", 6379: "Redis", 9200: "Elasticsearch", 11211: "Memcached", 27017: "MongoDB",
 };
 
-export function calcularPuntaje({ cert, subdominios, errorCrt, reputacion, errorReputacion, exposicion, errorExposicion }) {
+export function calcularPuntaje({ cert, subdominios, errorCrt, reputacion, errorReputacion, exposicion, errorExposicion, correo, errorCorreo }) {
   let hayCritico = false;
   const hallazgos = []; // incluyen `resta` (puntos que quitan a su categoría) hasta el final
 
@@ -122,11 +122,81 @@ export function calcularPuntaje({ cert, subdominios, errorCrt, reputacion, error
     }
   }
 
+  // --- Correo: SPF, DMARC y DKIM ---
+  if (errorCorreo) {
+    agregar("Correo", "info", "No se pudo revisar la configuración de correo",
+      "El DNS no respondió a tiempo.", "Intenta el análisis de nuevo más tarde.");
+  } else if (correo) {
+    // Si el dominio no recibe correo, la falta de SPF/DMARC pesa menos (aun así conviene protegerlo)
+    const sinMx = !correo.recibeCorreo;
+    const { spf, dmarc } = correo;
+
+    if (sinMx) {
+      agregar("Correo", "info", "El dominio no tiene servidor de correo (MX)",
+        "No recibe correo, pero igual pueden suplantarlo para enviar mensajes falsos.",
+        "Si no lo usas para correo, publica SPF con -all y DMARC con p=reject.");
+    }
+
+    if (!spf.presente) {
+      agregar("Correo", sinMx ? "media" : "alta", "No tiene registro SPF",
+        "Sin SPF cualquiera puede enviar correo haciéndose pasar por tu dominio.",
+        "Publica un registro TXT que empiece con v=spf1 e indique tus servidores de envío.", sinMx ? 20 : 40);
+    } else if (spf.multiples) {
+      agregar("Correo", "media", "Hay más de un registro SPF",
+        "Con varios registros SPF los receptores lo tratan como error y lo ignoran.",
+        "Une todo en un solo registro SPF.", 25);
+    } else if (spf.todo === "+") {
+      agregar("Correo", "alta", "SPF permite enviar a cualquiera (+all)",
+        "El registro autoriza a cualquier servidor, así que no protege nada.",
+        "Cambia el final del registro a -all o ~all.", 60);
+    } else if (spf.todo === "?") {
+      agregar("Correo", "media", "SPF no toma postura (?all)",
+        "El registro no indica qué hacer con los remitentes no autorizados.",
+        "Cambia el final del registro a -all.", 25);
+    } else if (spf.todo === "~") {
+      agregar("Correo", "baja", "SPF marca como sospechoso, pero no rechaza (~all)",
+        "Es una configuración aceptable, aunque -all es más estricta.",
+        "Cuando estés seguro de tus servidores de envío, cambia a -all.", 10);
+    } else if (spf.todo === "-" || spf.redirect) {
+      agregar("Correo", "info", "SPF configurado", spf.redirect && !spf.todo ? "Delega a otro dominio con redirect=." : "Rechaza a los remitentes no autorizados.", "Sin acción necesaria.");
+    } else {
+      agregar("Correo", "media", "El registro SPF no termina con una regla (all)",
+        "Sin una regla final, los remitentes no listados quedan sin definir.",
+        "Termina el registro con -all.", 25);
+    }
+
+    if (!dmarc.presente) {
+      agregar("Correo", sinMx ? "media" : "alta", "No tiene registro DMARC",
+        "Sin DMARC los receptores no saben qué hacer con el correo falso que usa tu dominio.",
+        "Publica un TXT en _dmarc con v=DMARC1; p=none; rua=mailto:tu@correo y endurece la política con el tiempo.", sinMx ? 20 : 40);
+    } else if (dmarc.politica === "none") {
+      agregar("Correo", "media", "DMARC solo monitorea (p=none)",
+        "Recibes reportes, pero el correo falso no se bloquea.",
+        "Cuando los reportes salgan limpios, cambia a p=quarantine y luego p=reject.", 25);
+    } else if (dmarc.pct < 100) {
+      agregar("Correo", "baja", `DMARC solo se aplica al ${dmarc.pct}% del correo`,
+        "El resto del correo falso no recibe la política.", "Sube pct a 100.", 10);
+    } else {
+      agregar("Correo", "info", `DMARC activo (p=${dmarc.politica || "?"})`, "Los receptores aplican tu política.", "Sin acción necesaria.");
+    }
+
+    if (!sinMx) {
+      if (correo.dkim.length) {
+        agregar("Correo", "info", "DKIM detectado", `Selectores encontrados: ${correo.dkim.join(", ")}.`, "Sin acción necesaria.");
+      } else {
+        agregar("Correo", "info", "No se detectó DKIM con los selectores comunes",
+          "El selector de DKIM es privado: puede existir con otro nombre, por eso no resta puntos.",
+          "Verifica en tu proveedor de correo que la firma DKIM esté activada.");
+      }
+    }
+  }
+
   // --- Puntaje por categoría y total ponderado ---
   // Una categoría se evalúa solo si su fuente principal respondió (las demás aún no existen)
   const evaluada = {
     tls: true, // sin HTTPS también es un resultado: la categoría queda en 0
     exposicion: Boolean((reputacion && !errorReputacion) || (exposicion && !errorExposicion)),
+    correo: Boolean(correo && !errorCorreo),
   };
 
   const categorias = CATEGORIAS.map((c) => {
