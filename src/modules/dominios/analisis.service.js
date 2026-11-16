@@ -13,7 +13,7 @@ import { calcularPuntaje } from "../../domain/puntaje.js";
 const valorDe = (r) => (r.status === "fulfilled" ? r.value : null);
 
 /** Ejecuta el análisis completo de un host y devuelve puntaje, hallazgos y los datos recolectados. */
-export async function analizarHost(host) {
+export async function analizarHost(host, propios = new Set()) {
   let ip;
   try {
     ip = await resolverIpPublica(host);
@@ -38,6 +38,8 @@ export async function analizarHost(host) {
   const correo = valorDe(resCorreo);
   const cabeceras = valorDe(resCabeceras);
   const similares = valorDe(resSimilares);
+  // Las variantes que el dueño marcó como suyas no cuentan para el puntaje
+  const similaresParaPuntaje = similares && { ...similares, similares: similares.similares.filter((s) => !propios.has(s.nombre)) };
 
   const { puntaje, categorias, hallazgos } = calcularPuntaje({
     cert,
@@ -51,7 +53,7 @@ export async function analizarHost(host) {
     errorCorreo: resCorreo.status === "rejected",
     cabeceras,
     errorCabeceras: resCabeceras.status === "rejected",
-    similares,
+    similares: similaresParaPuntaje,
     errorSimilares: resSimilares.status === "rejected",
   });
 

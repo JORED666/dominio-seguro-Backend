@@ -28,3 +28,33 @@ export async function guardarAnalisis({ dominioId, puntaje, duracionMs, categori
   ]);
   return analisis;
 }
+
+export const listarSimilares = (dominioId) => prisma.similar.findMany({ where: { dominioId } });
+
+// Variantes que el usuario marcó como suyas: no cuentan como amenaza
+export async function nombresPropios(dominioId) {
+  const filas = await prisma.similar.findMany({ where: { dominioId, propio: true }, select: { nombre: true } });
+  return filas.map((s) => s.nombre);
+}
+
+export const buscarSimilar = (id, dominioId) => prisma.similar.findFirst({ where: { id, dominioId } });
+
+export const actualizarSimilar = (id, data) => prisma.similar.update({ where: { id }, data });
+
+// Guarda o actualiza las variantes. detectadoEn se fija la primera vez que la variante aparece
+// registrada (mientras estaba libre no cuenta), y no cambia en los análisis siguientes.
+export async function guardarSimilares(dominioId, lista) {
+  const previas = new Map((await prisma.similar.findMany({ where: { dominioId } })).map((s) => [s.nombre, s]));
+  const ahora = new Date();
+  await prisma.$transaction(
+    lista.map((s) => {
+      const datos = { tecnica: s.tecnica, estado: s.estado, riesgo: s.riesgo, conCorreo: s.conCorreo, conCertificado: s.conCertificado, verificadoEn: ahora };
+      const detectadoEn = previas.get(s.nombre)?.detectadoEn ?? (s.estado !== "libre" ? ahora : null);
+      return prisma.similar.upsert({
+        where: { dominioId_nombre: { dominioId, nombre: s.nombre } },
+        create: { dominioId, nombre: s.nombre, ...datos, detectadoEn },
+        update: { ...datos, detectadoEn },
+      });
+    })
+  );
+}

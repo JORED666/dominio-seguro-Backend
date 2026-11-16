@@ -1,5 +1,5 @@
 import { validar } from "../../lib/validar.js";
-import { dominioSchema } from "./dominios.schemas.js";
+import { dominioSchema, similarSchema } from "./dominios.schemas.js";
 import * as servicio from "./dominios.service.js";
 
 export async function listar(req, res) {
@@ -17,4 +17,13 @@ export async function analizar(req, res) {
 
 export async function historial(req, res) {
   res.json(await servicio.historial(req.params.id, req.usuario.id));
+}
+
+export async function similares(req, res) {
+  res.json(await servicio.similares(req.params.id, req.usuario.id));
+}
+
+export async function marcarSimilar(req, res) {
+  const cambios = validar(similarSchema, req.body);
+  res.json(await servicio.marcarSimilar(req.params.id, req.params.similarId, req.usuario.id, cambios));
 }
