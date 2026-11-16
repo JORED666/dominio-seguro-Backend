@@ -16,7 +16,7 @@ const PUERTOS_PELIGROSOS = {
   5432: "PostgreSQL", 5900: "VNC", 6379: "Redis", 9200: "Elasticsearch", 11211: "Memcached", 27017: "MongoDB",
 };
 
-export function calcularPuntaje({ cert, subdominios, errorCrt, reputacion, errorReputacion, exposicion, errorExposicion, correo, errorCorreo, cabeceras, errorCabeceras }) {
+export function calcularPuntaje({ cert, subdominios, errorCrt, reputacion, errorReputacion, exposicion, errorExposicion, correo, errorCorreo, cabeceras, errorCabeceras, similares, errorSimilares }) {
   let hayCritico = false;
   const hallazgos = []; // incluyen `resta` (puntos que quitan a su categoría) hasta el final
 
@@ -122,6 +122,31 @@ export function calcularPuntaje({ cert, subdominios, errorCrt, reputacion, error
     }
   }
 
+  // --- Dominios similares (typosquatting) ---
+  if (errorSimilares) {
+    agregar("Similares", "info", "No se pudieron revisar los dominios similares",
+      "El DNS no respondió a tiempo.", "Intenta el análisis de nuevo más tarde.");
+  } else if (similares) {
+    const peligrosos = (riesgo) => similares.similares.filter((s) => s.riesgo === riesgo);
+    const nombres = (lista) => lista.slice(0, 5).map((s) => s.nombre).join(", ") + (lista.length > 5 ? "…" : "");
+    const altos = peligrosos("alto");
+    const medios = peligrosos("medio");
+    if (altos.length) {
+      agregar("Similares", "alta", `${altos.length} dominios parecidos al tuyo están activos y podrían suplantarte`,
+        `Tienen sitio web, correo o certificado: ${nombres(altos)}.`,
+        "Revisa si te están imitando; si es así, repórtalos a su registrador y avisa a tus clientes.", Math.min(70, altos.length * 25));
+    }
+    if (medios.length) {
+      agregar("Similares", "media", `${medios.length} dominios parecidos al tuyo están registrados`,
+        `Alguien los registró: ${nombres(medios)}.`,
+        "Vigílalos con frecuencia y considera registrar tú las variantes más parecidas.", Math.min(30, medios.length * 10));
+    }
+    if (!altos.length && !medios.length) {
+      agregar("Similares", "info", "No se detectaron dominios parecidos en uso",
+        `Se revisaron ${similares.revisadas - similares.fallidas} variantes del dominio.`, "Sin acción necesaria.");
+    }
+  }
+
   // --- Cabeceras HTTP (Mozilla Observatory) ---
   if (errorCabeceras) {
     agregar("Cabeceras", "info", "No se pudieron revisar las cabeceras de seguridad",
@@ -219,6 +244,7 @@ export function calcularPuntaje({ cert, subdominios, errorCrt, reputacion, error
   const evaluada = {
     tls: true, // sin HTTPS también es un resultado: la categoría queda en 0
     exposicion: Boolean((reputacion && !errorReputacion) || (exposicion && !errorExposicion)),
+    similares: Boolean(similares && !errorSimilares),
     cabeceras: Boolean(cabeceras && !errorCabeceras),
     correo: Boolean(correo && !errorCorreo),
   };
