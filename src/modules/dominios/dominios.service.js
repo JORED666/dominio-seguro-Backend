@@ -36,6 +36,7 @@ export async function analizar(id, usuarioId) {
     dominioId: dominio.id,
     puntaje,
     duracionMs: Date.now() - inicio,
+    categorias,
     hallazgos,
   });
 
