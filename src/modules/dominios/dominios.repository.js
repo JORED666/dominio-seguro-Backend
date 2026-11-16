@@ -3,8 +3,8 @@ import { prisma } from "../../db.js";
 export const listar = (usuarioId) =>
   prisma.dominio.findMany({ where: { usuarioId }, orderBy: { creadoEn: "desc" } });
 
-export const crear = (usuarioId, nombreDominio) =>
-  prisma.dominio.create({ data: { usuarioId, nombreDominio } });
+export const crear = (usuarioId, nombreDominio, tokenVerificacion) =>
+  prisma.dominio.create({ data: { usuarioId, nombreDominio, tokenVerificacion } });
 
 // Solo devuelve el dominio si pertenece al usuario
 export const buscarDeUsuario = (id, usuarioId) =>
@@ -58,3 +58,11 @@ export async function guardarSimilares(dominioId, lista) {
     })
   );
 }
+
+// Dominios anteriores a la verificación no tienen token: se les da uno sin pisar el que ya exista
+export async function asegurarToken(id, token) {
+  await prisma.dominio.updateMany({ where: { id, tokenVerificacion: null }, data: { tokenVerificacion: token } });
+  return prisma.dominio.findUnique({ where: { id } });
+}
+
+export const marcarVerificado = (id) => prisma.dominio.update({ where: { id }, data: { verificadoEn: new Date() } });

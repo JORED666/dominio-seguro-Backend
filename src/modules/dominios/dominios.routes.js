@@ -8,6 +8,8 @@ router.use(requiereAuth);
 
 router.get("/", asyncHandler(controlador.listar));
 router.post("/", asyncHandler(controlador.crear));
+router.get("/:id/verificacion", asyncHandler(controlador.verificacion));
+router.post("/:id/verificar", asyncHandler(controlador.verificar));
 router.post("/:id/analizar", asyncHandler(controlador.analizar));
 router.get("/:id/analisis", asyncHandler(controlador.historial));
 router.get("/:id/similares", asyncHandler(controlador.similares));
