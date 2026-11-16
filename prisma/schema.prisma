@@ -20,14 +20,16 @@ model Usuario {
 }
 
 model Dominio {
-  id            String     @id @default(uuid())
-  usuarioId     String     @map("usuario_id")
-  nombreDominio String     @map("nombre_dominio")
-  ultimoPuntaje Int?       @map("ultimo_puntaje")
-  creadoEn      DateTime   @default(now()) @map("creado_en")
-  usuario       Usuario    @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
-  analisis      Analisis[]
-  similares     Similar[]
+  id                String     @id @default(uuid())
+  usuarioId         String     @map("usuario_id")
+  nombreDominio     String     @map("nombre_dominio")
+  ultimoPuntaje     Int?       @map("ultimo_puntaje")
+  tokenVerificacion String?    @map("token_verificacion")
+  verificadoEn      DateTime?  @map("verificado_en")
+  creadoEn          DateTime   @default(now()) @map("creado_en")
+  usuario           Usuario    @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  analisis          Analisis[]
+  similares         Similar[]
 
   @@unique([usuarioId, nombreDominio])
   @@map("dominios")

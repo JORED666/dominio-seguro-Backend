@@ -27,3 +27,11 @@ export async function marcarSimilar(req, res) {
   const cambios = validar(similarSchema, req.body);
   res.json(await servicio.marcarSimilar(req.params.id, req.params.similarId, req.usuario.id, cambios));
 }
+
+export async function verificacion(req, res) {
+  res.json(await servicio.verificacion(req.params.id, req.usuario.id));
+}
+
+export async function verificar(req, res) {
+  res.json(await servicio.verificar(req.params.id, req.usuario.id));
+}
