@@ -16,7 +16,7 @@ const PUERTOS_PELIGROSOS = {
   5432: "PostgreSQL", 5900: "VNC", 6379: "Redis", 9200: "Elasticsearch", 11211: "Memcached", 27017: "MongoDB",
 };
 
-export function calcularPuntaje({ cert, subdominios, errorCrt, reputacion, errorReputacion, exposicion, errorExposicion, correo, errorCorreo }) {
+export function calcularPuntaje({ cert, subdominios, errorCrt, reputacion, errorReputacion, exposicion, errorExposicion, correo, errorCorreo, cabeceras, errorCabeceras }) {
   let hayCritico = false;
   const hallazgos = []; // incluyen `resta` (puntos que quitan a su categoría) hasta el final
 
@@ -122,6 +122,29 @@ export function calcularPuntaje({ cert, subdominios, errorCrt, reputacion, error
     }
   }
 
+  // --- Cabeceras HTTP (Mozilla Observatory) ---
+  if (errorCabeceras) {
+    agregar("Cabeceras", "info", "No se pudieron revisar las cabeceras de seguridad",
+      "Mozilla Observatory no respondió o no pudo evaluar el sitio.", "Intenta el análisis de nuevo más tarde.");
+  } else if (cabeceras) {
+    const nota = `nota ${cabeceras.nota}, puntaje ${cabeceras.puntaje}`;
+    const fallos = `${cabeceras.pruebasFallidas} de ${cabeceras.pruebasTotales} pruebas no pasaron`;
+    const detalle = `Observatory: ${nota}; ${fallos}. Informe completo: ${cabeceras.informe}`;
+    const resta = Math.max(0, 100 - Math.min(100, cabeceras.puntaje));
+    if (cabeceras.puntaje >= 90) {
+      agregar("Cabeceras", "info", "Cabeceras de seguridad bien configuradas", detalle, "Sin acción necesaria.");
+    } else if (cabeceras.puntaje >= 70) {
+      agregar("Cabeceras", "baja", "Las cabeceras de seguridad se pueden mejorar", detalle,
+        "Revisa en el informe qué pruebas fallaron (por ejemplo CSP, HSTS o cookies) y corrígelas.", resta);
+    } else if (cabeceras.puntaje >= 40) {
+      agregar("Cabeceras", "media", "Faltan cabeceras de seguridad importantes", detalle,
+        "Activa HSTS, una política CSP y X-Content-Type-Options; el informe indica cuáles faltan.", resta);
+    } else {
+      agregar("Cabeceras", "alta", "El sitio casi no usa cabeceras de seguridad", detalle,
+        "Empieza por HSTS, CSP y X-Frame-Options en tu servidor web; el informe indica cómo.", resta);
+    }
+  }
+
   // --- Correo: SPF, DMARC y DKIM ---
   if (errorCorreo) {
     agregar("Correo", "info", "No se pudo revisar la configuración de correo",
@@ -196,6 +219,7 @@ export function calcularPuntaje({ cert, subdominios, errorCrt, reputacion, error
   const evaluada = {
     tls: true, // sin HTTPS también es un resultado: la categoría queda en 0
     exposicion: Boolean((reputacion && !errorReputacion) || (exposicion && !errorExposicion)),
+    cabeceras: Boolean(cabeceras && !errorCabeceras),
     correo: Boolean(correo && !errorCorreo),
   };
 
