@@ -27,6 +27,7 @@ model Dominio {
   creadoEn      DateTime   @default(now()) @map("creado_en")
   usuario       Usuario    @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
   analisis      Analisis[]
+  similares     Similar[]
 
   @@unique([usuarioId, nombreDominio])
   @@map("dominios")
@@ -57,4 +58,24 @@ model Hallazgo {
   analisis      Analisis @relation(fields: [analisisId], references: [id], onDelete: Cascade)
 
   @@map("hallazgos")
+}
+
+// Variantes parecidas al dominio (typosquatting) y lo que el usuario decidió de cada una
+model Similar {
+  id             String    @id @default(uuid())
+  dominioId      String    @map("dominio_id")
+  nombre         String
+  tecnica        String
+  estado         String
+  riesgo         String
+  conCorreo      Boolean   @map("con_correo")
+  conCertificado Boolean   @map("con_certificado")
+  propio         Boolean   @default(false)
+  revisado       Boolean   @default(false)
+  detectadoEn    DateTime? @map("detectado_en")
+  verificadoEn   DateTime  @default(now()) @map("verificado_en")
+  dominio        Dominio   @relation(fields: [dominioId], references: [id], onDelete: Cascade)
+
+  @@unique([dominioId, nombre])
+  @@map("similares")
 }

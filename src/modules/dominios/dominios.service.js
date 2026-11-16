@@ -30,7 +30,8 @@ export async function registrar(usuarioId, nombre) {
 export async function analizar(id, usuarioId) {
   const dominio = await dominioDelUsuario(id, usuarioId);
   const inicio = Date.now();
-  const { puntaje, categorias, hallazgos, cert, subdominios, reputacion, exposicion, similares } = await analizarHost(dominio.nombreDominio);
+  const propios = new Set(await repo.nombresPropios(dominio.id));
+  const { puntaje, categorias, hallazgos, cert, subdominios, reputacion, exposicion, similares } = await analizarHost(dominio.nombreDominio, propios);
 
   const analisis = await repo.guardarAnalisis({
     dominioId: dominio.id,
@@ -39,6 +40,8 @@ export async function analizar(id, usuarioId) {
     categorias,
     hallazgos,
   });
+
+  if (similares.length) await repo.guardarSimilares(dominio.id, similares);
 
   return {
     ...analisis,
@@ -55,4 +58,18 @@ export async function analizar(id, usuarioId) {
 export async function historial(id, usuarioId) {
   const dominio = await dominioDelUsuario(id, usuarioId);
   return (await repo.listarAnalisis(dominio.id)).map((a) => ({ ...a, nivel: nivelDePuntaje(a.puntaje) }));
+}
+
+const RANGO_RIESGO = { alto: 0, medio: 1, bajo: 2 };
+
+export async function similares(id, usuarioId) {
+  const dominio = await dominioDelUsuario(id, usuarioId);
+  const lista = await repo.listarSimilares(dominio.id);
+  return lista.sort((a, b) => RANGO_RIESGO[a.riesgo] - RANGO_RIESGO[b.riesgo] || a.nombre.localeCompare(b.nombre));
+}
+
+export async function marcarSimilar(id, similarId, usuarioId, cambios) {
+  const dominio = await dominioDelUsuario(id, usuarioId);
+  if (!(await repo.buscarSimilar(similarId, dominio.id))) throw new ErrorHttp(404, "Dominio similar no encontrado");
+  return repo.actualizarSimilar(similarId, cambios);
 }
