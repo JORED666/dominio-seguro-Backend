@@ -30,7 +30,7 @@ export async function registrar(usuarioId, nombre) {
 export async function analizar(id, usuarioId) {
   const dominio = await dominioDelUsuario(id, usuarioId);
   const inicio = Date.now();
-  const { puntaje, hallazgos, cert, subdominios, reputacion, exposicion } = await analizarHost(dominio.nombreDominio);
+  const { puntaje, categorias, hallazgos, cert, subdominios, reputacion, exposicion } = await analizarHost(dominio.nombreDominio);
 
   const analisis = await repo.guardarAnalisis({
     dominioId: dominio.id,
@@ -42,6 +42,7 @@ export async function analizar(id, usuarioId) {
   return {
     ...analisis,
     nivel: nivelDePuntaje(puntaje),
+    categorias,
     certificado: cert,
     subdominios,
     reputacion: reputacion && { riesgo: reputacion.risk_score, nivel: reputacion.risk_level, asn: reputacion.network?.asn_org },
