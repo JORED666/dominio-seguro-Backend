@@ -18,10 +18,10 @@ export const listarAnalisis = (dominioId) =>
   });
 
 // Guarda el análisis con sus hallazgos y actualiza el último puntaje del dominio
-export async function guardarAnalisis({ dominioId, puntaje, duracionMs, hallazgos }) {
+export async function guardarAnalisis({ dominioId, puntaje, duracionMs, categorias, hallazgos }) {
   const [analisis] = await prisma.$transaction([
     prisma.analisis.create({
-      data: { dominioId, puntaje, duracionMs, hallazgos: { create: hallazgos } },
+      data: { dominioId, puntaje, duracionMs, categorias, hallazgos: { create: hallazgos } },
       include: { hallazgos: true },
     }),
     prisma.dominio.update({ where: { id: dominioId }, data: { ultimoPuntaje: puntaje } }),

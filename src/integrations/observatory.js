@@ -11,7 +11,7 @@ export async function revisarCabeceras(host, peticion = fetch) {
 
   const res = await peticion(`${URL_BASE}?host=${encodeURIComponent(host)}`, {
     method: "POST",
-    signal: AbortSignal.timeout(20000),
+    signal: AbortSignal.timeout(30000),
   });
   if (!res.ok) throw new Error(`Observatory respondió ${res.status}`);
 
