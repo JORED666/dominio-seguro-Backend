@@ -30,7 +30,7 @@ export async function analizarHost(host) {
   const reputacion = valorDe(resRep);
   const exposicion = valorDe(resExp);
 
-  const { puntaje, hallazgos } = calcularPuntaje({
+  const { puntaje, categorias, hallazgos } = calcularPuntaje({
     cert,
     subdominios,
     errorCrt: resCrt.status === "rejected",
@@ -40,5 +40,5 @@ export async function analizarHost(host) {
     errorExposicion: resExp.status === "rejected",
   });
 
-  return { puntaje, hallazgos, cert, subdominios, reputacion, exposicion };
+  return { puntaje, categorias, hallazgos, cert, subdominios, reputacion, exposicion };
 }
