@@ -6,6 +6,7 @@ import { consultarReputacion } from "../../integrations/ipscore.js";
 import { consultarExposicion } from "../../integrations/internetdb.js";
 import { revisarCorreo } from "../../integrations/correo.js";
 import { revisarCabeceras } from "../../integrations/observatory.js";
+import { revisarSimilares } from "../../integrations/similares.js";
 import { calcularPuntaje } from "../../domain/puntaje.js";
 
 // Consulta las fuentes en paralelo: si una falla, el análisis sigue con lo demás
@@ -20,13 +21,14 @@ export async function analizarHost(host) {
     throw new ErrorHttp(400, err.message);
   }
 
-  const [resCert, resCrt, resRep, resExp, resCorreo, resCabeceras] = await Promise.allSettled([
+  const [resCert, resCrt, resRep, resExp, resCorreo, resCabeceras, resSimilares] = await Promise.allSettled([
     revisarCertificado(ip, host),
     descubrirSubdominios(host),
     consultarReputacion(ip),
     consultarExposicion(ip),
     revisarCorreo(host),
     revisarCabeceras(host),
+    revisarSimilares(host),
   ]);
 
   const cert = valorDe(resCert);
@@ -35,6 +37,7 @@ export async function analizarHost(host) {
   const exposicion = valorDe(resExp);
   const correo = valorDe(resCorreo);
   const cabeceras = valorDe(resCabeceras);
+  const similares = valorDe(resSimilares);
 
   const { puntaje, categorias, hallazgos } = calcularPuntaje({
     cert,
@@ -48,7 +51,9 @@ export async function analizarHost(host) {
     errorCorreo: resCorreo.status === "rejected",
     cabeceras,
     errorCabeceras: resCabeceras.status === "rejected",
+    similares,
+    errorSimilares: resSimilares.status === "rejected",
   });
 
-  return { puntaje, categorias, hallazgos, cert, subdominios, reputacion, exposicion };
+  return { puntaje, categorias, hallazgos, cert, subdominios, reputacion, exposicion, similares: similares?.similares ?? [] };
 }
