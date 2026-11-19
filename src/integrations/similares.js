@@ -21,6 +21,8 @@ async function lista(consulta) {
 function tieneCertificado(ip, host) {
   if (esIpPrivada(ip)) return Promise.resolve(false);
   return new Promise((resolve) => {
+    // Riesgo aceptado: es un analizador y debe leer certificados inválidos. Solo se hace el saludo TLS, no se envían datos, y el destino ya pasó la validación anti-SSRF.
+    // nosemgrep: problem-based-packs.insecure-transport.js-node.bypass-tls-verification.bypass-tls-verification
     const socket = tls.connect({ host: ip, port: 443, servername: host, rejectUnauthorized: false, timeout: 4000 }, () => {
       socket.end();
       resolve(true);

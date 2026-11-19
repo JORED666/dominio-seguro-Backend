@@ -4,6 +4,8 @@ import tls from "node:tls";
 export function revisarCertificado(ip, host) {
   return new Promise((resolve, reject) => {
     const socket = tls.connect(
+      // Riesgo aceptado: es un analizador y debe leer certificados inválidos. Solo se hace el saludo TLS, no se envían datos, y el destino ya pasó la validación anti-SSRF.
+      // nosemgrep: problem-based-packs.insecure-transport.js-node.bypass-tls-verification.bypass-tls-verification
       { host: ip, port: 443, servername: host, rejectUnauthorized: false, timeout: 8000 },
       () => {
         const cert = socket.getPeerCertificate();
