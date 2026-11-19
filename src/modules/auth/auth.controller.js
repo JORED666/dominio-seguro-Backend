@@ -13,7 +13,8 @@ const opcionesCookie = () => ({
   path: "/api/auth",
 });
 
-function enviarSesion(res, estado, { refresco, ...cuerpo }) {
+export function enviarSesion(res, estado, { refresco, ...cuerpo }) {
+  if (cuerpo.mfaRequerido) return res.status(estado).json(cuerpo);
   res.cookie(COOKIE, refresco, { ...opcionesCookie(), maxAge: servicio.DURACION_REFRESCO_MS });
   res.status(estado).json(cuerpo);
 }

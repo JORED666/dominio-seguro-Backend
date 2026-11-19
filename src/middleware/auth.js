@@ -7,6 +7,7 @@ export function requiereAuth(req, res, next) {
 
   try {
     const payload = jwt.verify(token, process.env.JWT_SECRET, { algorithms: ["HS256"] });
+    if (payload.aud) throw new Error("Token de otro tipo");
     req.usuario = { id: payload.sub, rol: payload.rol };
     next();
   } catch {

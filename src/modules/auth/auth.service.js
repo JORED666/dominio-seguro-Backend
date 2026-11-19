@@ -21,8 +21,17 @@ function firmarToken(usuario) {
   });
 }
 
+// Token corto que solo sirve para completar el segundo factor (audience "mfa": requiereAuth lo rechaza)
+export const firmarTokenMfa = (usuario) =>
+  jwt.sign({}, process.env.JWT_SECRET, {
+    subject: usuario.id,
+    audience: "mfa",
+    expiresIn: "5m",
+    algorithm: "HS256",
+  });
+
 // Cada inicio de sesión abre una "familia" de tokens de refresco; cada refresco la renueva
-async function crearSesion(usuario, familia = randomUUID()) {
+export async function crearSesion(usuario, familia = randomUUID()) {
   const refresco = nuevoTokenRefresco();
   await repo.guardarRefresco({
     usuarioId: usuario.id,
@@ -33,7 +42,7 @@ async function crearSesion(usuario, familia = randomUUID()) {
   return {
     token: firmarToken(usuario),
     refresco,
-    usuario: { id: usuario.id, nombre: usuario.nombre, correo: usuario.correo, rol: usuario.rol },
+    usuario: { id: usuario.id, nombre: usuario.nombre, correo: usuario.correo, rol: usuario.rol, mfaActivo: usuario.mfaActivo },
   };
 }
 
@@ -50,6 +59,8 @@ export async function iniciarSesion({ correo, password }) {
   const valido = await argon2.verify(usuario ? usuario.passwordHash : HASH_FALSO, password);
   // Mensaje genérico: no revela si el correo existe
   if (!usuario || !valido) throw new ErrorHttp(401, "Credenciales incorrectas");
+  // Con verificación en dos pasos activa, todavía no hay sesión: falta el código
+  if (usuario.mfaActivo) return { mfaRequerido: true, mfaToken: firmarTokenMfa(usuario) };
   return crearSesion(usuario);
 }
 
