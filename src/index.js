@@ -15,3 +15,6 @@ const { app } = await import("./app.js");
 
 const puerto = process.env.PORT || 3000;
 app.listen(puerto, () => console.log(`API escuchando en http://localhost:${puerto}`));
+
+const { iniciarRevisionProgramada } = await import("./jobs/revision.js");
+iniciarRevisionProgramada();

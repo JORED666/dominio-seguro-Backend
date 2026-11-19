@@ -8,5 +8,6 @@ router.use(requiereAuth, requiereRol("admin"));
 
 router.get("/usuarios", asyncHandler(controlador.usuarios));
 router.patch("/usuarios/:id", asyncHandler(controlador.cambiarRol));
+router.post("/revision", asyncHandler(controlador.revision));
 
 export default router;
