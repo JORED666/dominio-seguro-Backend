@@ -19,7 +19,7 @@ export function cifrar(texto) {
 
 export function descifrar(guardado) {
   const [version, iv, etiqueta, datos] = String(guardado).split(":");
-  if (version !== "v1" || !iv || !etiqueta || !datos) throw new Error("Formato de cifrado desconocido");
+  if (version !== "v1" || !iv || !etiqueta || datos === undefined) throw new Error("Formato de cifrado desconocido");
   const descifrador = createDecipheriv("aes-256-gcm", clave(), Buffer.from(iv, "base64"));
   descifrador.setAuthTag(Buffer.from(etiqueta, "base64"));
   return Buffer.concat([descifrador.update(Buffer.from(datos, "base64")), descifrador.final()]).toString("utf8");
