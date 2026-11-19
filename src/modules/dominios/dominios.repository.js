@@ -17,6 +17,17 @@ export const listarAnalisis = (dominioId) =>
     include: { hallazgos: true },
   });
 
+// Análisis más reciente (con hallazgos): punto de comparación para detectar cambios
+export const ultimoAnalisis = (dominioId) =>
+  prisma.analisis.findFirst({ where: { dominioId }, orderBy: { fecha: "desc" }, include: { hallazgos: true } });
+
+// Dominios que se revisan cada día, con el dueño al que se avisa
+export const listarParaRevision = () =>
+  prisma.dominio.findMany({
+    where: process.env.EXIGIR_VERIFICACION !== "false" ? { verificadoEn: { not: null } } : {},
+    include: { usuario: { select: { nombre: true, correo: true } } },
+  });
+
 // Guarda el análisis con sus hallazgos y actualiza el último puntaje del dominio
 export async function guardarAnalisis({ dominioId, puntaje, duracionMs, categorias, hallazgos }) {
   const [analisis] = await prisma.$transaction([

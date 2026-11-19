@@ -1,4 +1,5 @@
 import { ErrorHttp } from "../../lib/errores.js";
+import { detectarCambios } from "../../domain/cambios.js";
 import { nivelDePuntaje } from "../../domain/puntaje.js";
 import { coincide, nombreRegistro, nuevoToken, valorRegistro } from "../../domain/verificacion.js";
 import { consultarTxt } from "../../integrations/dns-txt.js";
@@ -34,7 +35,14 @@ export async function analizar(id, usuarioId) {
   if (process.env.EXIGIR_VERIFICACION !== "false" && !dominio.verificadoEn) {
     throw new ErrorHttp(403, "Verifica que eres dueño del dominio antes de analizarlo");
   }
+  return (await ejecutarAnalisis(dominio)).respuesta;
+}
+
+// Corre el análisis completo, lo guarda y lo compara con el anterior.
+// Lo usan el botón "Analizar" y la revisión programada.
+export async function ejecutarAnalisis(dominio) {
   const inicio = Date.now();
+  const previo = await repo.ultimoAnalisis(dominio.id);
   const propios = new Set(await repo.nombresPropios(dominio.id));
   const { puntaje, categorias, hallazgos, cert, subdominios, reputacion, exposicion, similares } = await analizarHost(dominio.nombreDominio, propios);
 
@@ -48,8 +56,11 @@ export async function analizar(id, usuarioId) {
 
   if (similares.length) await repo.guardarSimilares(dominio.id, similares);
 
-  return {
+  const cambios = detectarCambios(previo, analisis);
+
+  const respuesta = {
     ...analisis,
+    cambios,
     nivel: nivelDePuntaje(puntaje),
     categorias,
     similares,
@@ -58,6 +69,7 @@ export async function analizar(id, usuarioId) {
     reputacion: reputacion && { riesgo: reputacion.risk_score, nivel: reputacion.risk_level, asn: reputacion.network?.asn_org },
     exposicion: exposicion && { puertos: exposicion.ports, vulnerabilidades: exposicion.vulns },
   };
+  return { cambios, respuesta };
 }
 
 export async function historial(id, usuarioId) {
