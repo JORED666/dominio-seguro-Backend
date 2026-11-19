@@ -13,6 +13,9 @@ model Usuario {
   correo       String    @unique
   passwordHash String    @map("password_hash")
   rol          String    @default("usuario")
+  mfaSecreto   String?   @map("mfa_secreto")
+  mfaActivo    Boolean   @default(false) @map("mfa_activo")
+  mfaUltimoPaso Int?     @map("mfa_ultimo_paso")
   creadoEn     DateTime  @default(now()) @map("creado_en")
   dominios     Dominio[]
   refrescos    TokenRefresco[]
