@@ -19,7 +19,7 @@ app.use(express.json({ limit: "10kb" }));
 // Límite de intentos en login y registro (frena fuerza bruta)
 const limitadorAuth = rateLimit({
   windowMs: 15 * 60 * 1000,
-  limit: 20,
+  limit: Number(process.env.LIMITE_AUTH) || 20,
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: "Demasiados intentos, espera unos minutos" },
@@ -38,4 +38,5 @@ app.use("/api/auth", limitadorAuth, authRoutes);
 app.use("/api/dominios", dominiosRoutes);
 app.use("/api/admin", adminRoutes);
 
+app.use((_req, res) => res.status(404).json({ error: "Ruta no encontrada" }));
 app.use(manejadorErrores);
