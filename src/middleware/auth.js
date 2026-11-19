@@ -13,3 +13,7 @@ export function requiereAuth(req, res, next) {
     res.status(401).json({ error: "Token inválido o expirado" });
   }
 }
+
+// Control de acceso por rol (RBAC): úsalo después de requiereAuth
+export const requiereRol = (...roles) => (req, res, next) =>
+  roles.includes(req.usuario?.rol) ? next() : res.status(403).json({ error: "No tienes permiso para esta acción" });

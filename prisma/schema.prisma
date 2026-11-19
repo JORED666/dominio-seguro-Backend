@@ -15,8 +15,23 @@ model Usuario {
   rol          String    @default("usuario")
   creadoEn     DateTime  @default(now()) @map("creado_en")
   dominios     Dominio[]
+  refrescos    TokenRefresco[]
 
   @@map("usuarios")
+}
+
+model TokenRefresco {
+  id        String    @id @default(uuid())
+  usuarioId String    @map("usuario_id")
+  familia   String
+  hash      String    @unique
+  expiraEn  DateTime  @map("expira_en")
+  usadoEn   DateTime? @map("usado_en")
+  creadoEn  DateTime  @default(now()) @map("creado_en")
+  usuario   Usuario   @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@index([familia])
+  @@map("tokens_refresco")
 }
 
 model Dominio {

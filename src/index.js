@@ -5,6 +5,11 @@ if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 32) {
   process.exit(1);
 }
 
+if (!/^[0-9a-f]{64}$/i.test(process.env.CIFRADO_KEY ?? "")) {
+  console.error("Falta CIFRADO_KEY (64 caracteres hexadecimales) en el archivo .env");
+  process.exit(1);
+}
+
 // Se importa después de validar el .env
 const { app } = await import("./app.js");
 

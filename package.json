@@ -7,7 +7,8 @@
     "dev": "node --watch src/index.js",
     "start": "node src/index.js",
     "db:migrate": "prisma migrate dev",
-    "db:generate": "prisma generate"
+    "db:generate": "prisma generate",
+    "admin": "node scripts/hacer-admin.js"
   },
   "dependencies": {
     "@prisma/client": "^6.19.0",
