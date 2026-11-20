@@ -8,17 +8,18 @@ datasource db {
 }
 
 model Usuario {
-  id           String    @id @default(uuid())
-  nombre       String
-  correo       String    @unique
-  passwordHash String    @map("password_hash")
-  rol          String    @default("usuario")
-  mfaSecreto   String?   @map("mfa_secreto")
-  mfaActivo    Boolean   @default(false) @map("mfa_activo")
-  mfaUltimoPaso Int?     @map("mfa_ultimo_paso")
-  creadoEn     DateTime  @default(now()) @map("creado_en")
-  dominios     Dominio[]
-  refrescos    TokenRefresco[]
+  id                String                  @id @default(uuid())
+  nombre            String
+  correo            String                  @unique
+  passwordHash      String                  @map("password_hash")
+  rol               String                  @default("usuario")
+  mfaSecreto        String?                 @map("mfa_secreto")
+  mfaActivo         Boolean                 @default(false) @map("mfa_activo")
+  mfaUltimoPaso     Int?                    @map("mfa_ultimo_paso")
+  creadoEn          DateTime                @default(now()) @map("creado_en")
+  dominios          Dominio[]
+  refrescos         TokenRefresco[]
+  restablecimientos TokenRestablecimiento[]
 
   @@map("usuarios")
 }
@@ -35,6 +36,20 @@ model TokenRefresco {
 
   @@index([familia])
   @@map("tokens_refresco")
+}
+
+// Enlace de un solo uso para restablecer la contraseña: solo se guarda el hash del token
+model TokenRestablecimiento {
+  id        String    @id @default(uuid())
+  usuarioId String    @map("usuario_id")
+  hash      String    @unique
+  expiraEn  DateTime  @map("expira_en")
+  usadoEn   DateTime? @map("usado_en")
+  creadoEn  DateTime  @default(now()) @map("creado_en")
+  usuario   Usuario   @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@index([usuarioId])
+  @@map("tokens_restablecimiento")
 }
 
 model Dominio {

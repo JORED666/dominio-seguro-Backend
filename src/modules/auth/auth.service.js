@@ -3,6 +3,7 @@ import { randomUUID } from "node:crypto";
 import jwt from "jsonwebtoken";
 import { ErrorHttp } from "../../lib/errores.js";
 import { hashToken, nuevoTokenRefresco } from "../../lib/tokens.js";
+import { enviarCorreo } from "../../integrations/mailer.js";
 import * as repo from "./auth.repository.js";
 
 export const DURACION_REFRESCO_MS = 7 * 24 * 60 * 60 * 1000;
@@ -90,4 +91,52 @@ export async function cerrarSesion(refresco) {
   if (!refresco) return;
   const fila = await repo.buscarRefresco(hashToken(refresco));
   if (fila) await repo.cerrarFamilia(fila.familia);
+}
+
+// ---- Restablecer contraseña ----
+const DURACION_RESTABLECER_MS = 30 * 60 * 1000;
+const ENLACE_INVALIDO = "El enlace no es válido o ya expiró";
+
+// Siempre hace lo mismo exista o no el correo; el controlador responde antes de esperarla
+export async function solicitarRestablecimiento(correo) {
+  const usuario = await repo.buscarPorCorreo(correo);
+  if (!usuario) return;
+  await repo.borrarRestablecimientos(usuario.id);
+  const token = nuevoTokenRefresco();
+  await repo.crearRestablecimiento({
+    usuarioId: usuario.id,
+    hash: hashToken(token),
+    expiraEn: new Date(Date.now() + DURACION_RESTABLECER_MS),
+  });
+  const base = (process.env.PANEL_URL || "http://localhost:4200").replace(/\/$/, "");
+  const enlace = `${base}/restablecer?token=${token}`;
+  await enviarCorreo({
+    para: usuario.correo,
+    asunto: "Restablece tu contraseña de Dominio Seguro",
+    texto:
+      "Recibimos una solicitud para restablecer tu contraseña.\n\n" +
+      `Abre este enlace (vale 30 minutos y sirve una sola vez):\n${enlace}\n\n` +
+      "Si no fuiste tú, ignora este correo: tu contraseña no cambia.",
+    html:
+      "<p>Recibimos una solicitud para restablecer tu contraseña.</p>" +
+      `<p><a href="${enlace}">Restablecer contraseña</a> (vale 30 minutos y sirve una sola vez).</p>` +
+      "<p>Si no fuiste tú, ignora este correo: tu contraseña no cambia.</p>",
+  });
+}
+
+export async function restablecerPassword({ token, password }) {
+  const fila = await repo.buscarRestablecimiento(hashToken(token));
+  if (!fila || fila.usadoEn || fila.expiraEn <= new Date()) throw new ErrorHttp(400, ENLACE_INVALIDO);
+  const passwordHash = await argon2.hash(password, { type: argon2.argon2id });
+  const hecho = await repo.aplicarRestablecimiento({ id: fila.id, usuarioId: fila.usuarioId, passwordHash });
+  if (!hecho) throw new ErrorHttp(400, ENLACE_INVALIDO);
+  // Aviso de seguridad: si no fue el dueño, se entera
+  const usuario = await repo.buscarPorId(fila.usuarioId);
+  if (usuario) {
+    enviarCorreo({
+      para: usuario.correo,
+      asunto: "Tu contraseña de Dominio Seguro fue cambiada",
+      texto: "Se cambió la contraseña de tu cuenta y se cerraron todas tus sesiones. Si no fuiste tú, restablécela de nuevo y activa la verificación en dos pasos.",
+    }).catch(() => {});
+  }
 }
