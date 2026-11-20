@@ -1,0 +1,813 @@
+{
+	"@programName": "ZAP",
+	"@version": "2.17.0",
+	"@generated": "Thu, 19 Nov 2026 22:50:24",
+	"created": "2026-11-19T22:50:24.352549870Z",
+	"insights":[
+		{
+			"level": "Medium",
+			"reason": "Exceeded High",
+			"site": "http://localhost:9999",
+			"key": "insight.code.4xx",
+			"description": "Percentage of responses with status code 4xx",
+			"statistic": "97"
+		},
+		{
+			"level": "Low",
+			"reason": "Warning",
+			"site": "",
+			"key": "insight.log.warn",
+			"description": "ZAP warnings logged - see the zap.log file for details",
+			"statistic": "1"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://localhost:9999",
+			"key": "insight.code.2xx",
+			"description": "Percentage of responses with status code 2xx",
+			"statistic": "2"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://localhost:9999",
+			"key": "insight.endpoint.ctype.application/json",
+			"description": "Percentage of endpoints with content type application/json",
+			"statistic": "98"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://localhost:9999",
+			"key": "insight.endpoint.method.GET",
+			"description": "Percentage of endpoints with method GET",
+			"statistic": "49"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://localhost:9999",
+			"key": "insight.endpoint.method.PATCH",
+			"description": "Percentage of endpoints with method PATCH",
+			"statistic": "18"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://localhost:9999",
+			"key": "insight.endpoint.method.POST",
+			"description": "Percentage of endpoints with method POST",
+			"statistic": "32"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://localhost:9999",
+			"key": "insight.endpoint.total",
+			"description": "Count of total endpoints",
+			"statistic": "55"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://localhost:9999",
+			"key": "insight.response.slow",
+			"description": "Percentage of slow responses",
+			"statistic": "10"
+		}
+	],
+	"site":[ 
+		{
+			"@name": "http://localhost:9999",
+			"@host": "localhost",
+			"@port": "9999",
+			"@ssl": "false",
+			"alerts": [ 
+				{
+					"pluginid": "100000",
+					"alertRef": "100000-1",
+					"alert": "A Client Error response code was returned by the server",
+					"name": "A Client Error response code was returned by the server",
+					"riskcode": "0",
+					"confidence": "3",
+					"riskdesc": "Informational (High)",
+					"desc": "<p>A response code of 404 was returned by the server.</p><p>This may indicate that the application is failing to handle unexpected input correctly.</p><p>Raised by the 'Alert on HTTP Response Code Error' script</p>",
+					"instances":[ 
+						{
+							"id": "29",
+							"uri": "http://localhost:9999",
+							"nodeName": "http:\/\/localhost:9999",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "1324",
+							"uri": "http://localhost:9999/",
+							"nodeName": "http:\/\/localhost:9999\/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "20",
+							"uri": "http://localhost:9999/6468880132320195660",
+							"nodeName": "http:\/\/localhost:9999\/6468880132320195660",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "30",
+							"uri": "http://localhost:9999/api",
+							"nodeName": "http:\/\/localhost:9999\/api",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "1325",
+							"uri": "http://localhost:9999/api/",
+							"nodeName": "http:\/\/localhost:9999\/api\/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "21",
+							"uri": "http://localhost:9999/api/2468862036996010407",
+							"nodeName": "http:\/\/localhost:9999\/api\/2468862036996010407",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "151",
+							"uri": "http://localhost:9999/api/admin",
+							"nodeName": "http:\/\/localhost:9999\/api\/admin",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "1328",
+							"uri": "http://localhost:9999/api/admin/",
+							"nodeName": "http:\/\/localhost:9999\/api\/admin\/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "22",
+							"uri": "http://localhost:9999/api/admin/2880047796765976263",
+							"nodeName": "http:\/\/localhost:9999\/api\/admin\/2880047796765976263",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "23",
+							"uri": "http://localhost:9999/api/admin/usuarios/1015117833712347677",
+							"nodeName": "http:\/\/localhost:9999\/api\/admin\/usuarios\/1015117833712347677",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "1513",
+							"uri": "http://localhost:9999/api/admin/usuarios/actuator/health",
+							"nodeName": "http:\/\/localhost:9999\/api\/admin\/usuarios\/actuator\/health",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "152",
+							"uri": "http://localhost:9999/api/auth",
+							"nodeName": "http:\/\/localhost:9999\/api\/auth",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "1329",
+							"uri": "http://localhost:9999/api/auth/",
+							"nodeName": "http:\/\/localhost:9999\/api\/auth\/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "24",
+							"uri": "http://localhost:9999/api/auth/3554465116669477863",
+							"nodeName": "http:\/\/localhost:9999\/api\/auth\/3554465116669477863",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "153",
+							"uri": "http://localhost:9999/api/auth/mfa",
+							"nodeName": "http:\/\/localhost:9999\/api\/auth\/mfa",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "1332",
+							"uri": "http://localhost:9999/api/auth/mfa/",
+							"nodeName": "http:\/\/localhost:9999\/api\/auth\/mfa\/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "25",
+							"uri": "http://localhost:9999/api/auth/mfa/306486782204305840",
+							"nodeName": "http:\/\/localhost:9999\/api\/auth\/mfa\/306486782204305840",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "154",
+							"uri": "http://localhost:9999/api/dominios/42b24948-4af0-4057-88ee-a9518c0c02af",
+							"nodeName": "http:\/\/localhost:9999\/api\/dominios\/42b24948-4af0-4057-88ee-a9518c0c02af",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "1333",
+							"uri": "http://localhost:9999/api/dominios/42b24948-4af0-4057-88ee-a9518c0c02af/",
+							"nodeName": "http:\/\/localhost:9999\/api\/dominios\/42b24948-4af0-4057-88ee-a9518c0c02af\/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "27",
+							"uri": "http://localhost:9999/api/dominios/42b24948-4af0-4057-88ee-a9518c0c02af/2722232085160253003",
+							"nodeName": "http:\/\/localhost:9999\/api\/dominios\/42b24948-4af0-4057-88ee-a9518c0c02af\/2722232085160253003",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "28",
+							"uri": "http://localhost:9999/api/dominios/42b24948-4af0-4057-88ee-a9518c0c02af/similares/146244124008683284",
+							"nodeName": "http:\/\/localhost:9999\/api\/dominios\/42b24948-4af0-4057-88ee-a9518c0c02af\/similares\/146244124008683284",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "26",
+							"uri": "http://localhost:9999/api/dominios/5605012198454039214",
+							"nodeName": "http:\/\/localhost:9999\/api\/dominios\/5605012198454039214",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "31",
+							"uri": "http://localhost:9999/api/admin/usuarios/42b24948-4af0-4057-88ee-a9518c0c02af",
+							"nodeName": "http:\/\/localhost:9999\/api\/admin\/usuarios\/42b24948-4af0-4057-88ee-a9518c0c02af ()({rol})",
+							"method": "PATCH",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "19",
+							"uri": "http://localhost:9999/api/admin/usuarios/42b24948-4af0-4057-88ee-a9518c0c02af",
+							"nodeName": "http:\/\/localhost:9999\/api\/admin\/usuarios\/42b24948-4af0-4057-88ee-a9518c0c02af ()({rol})",
+							"method": "PATCH",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "1315",
+							"uri": "http://localhost:9999/api/admin/usuarios/42b24948-4af0-4057-88ee-a9518c0c02af/",
+							"nodeName": "http:\/\/localhost:9999\/api\/admin\/usuarios\/42b24948-4af0-4057-88ee-a9518c0c02af\/ ()({rol})",
+							"method": "PATCH",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "995",
+							"uri": "http://localhost:9999/computeMetadata/v1/",
+							"nodeName": "http:\/\/localhost:9999\/computeMetadata\/v1\/ ()({rol})",
+							"method": "PATCH",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "978",
+							"uri": "http://localhost:9999/latest/meta-data/",
+							"nodeName": "http:\/\/localhost:9999\/latest\/meta-data\/ ()({rol})",
+							"method": "PATCH",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "1064",
+							"uri": "http://localhost:9999/metadata/instance",
+							"nodeName": "http:\/\/localhost:9999\/metadata\/instance ()({rol})",
+							"method": "PATCH",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "1072",
+							"uri": "http://localhost:9999/metadata/v1",
+							"nodeName": "http:\/\/localhost:9999\/metadata\/v1 ()({rol})",
+							"method": "PATCH",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "1013",
+							"uri": "http://localhost:9999/opc/v1/instance/",
+							"nodeName": "http:\/\/localhost:9999\/opc\/v1\/instance\/ ()({rol})",
+							"method": "PATCH",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "1030",
+							"uri": "http://localhost:9999/opc/v2/instance/",
+							"nodeName": "http:\/\/localhost:9999\/opc\/v2\/instance\/ ()({rol})",
+							"method": "PATCH",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "1079",
+							"uri": "http://localhost:9999/openstack/latest/meta_data.json",
+							"nodeName": "http:\/\/localhost:9999\/openstack\/latest\/meta_data.json ()({rol})",
+							"method": "PATCH",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "32",
+							"uri": "http://localhost:9999/api/auth/login",
+							"nodeName": "http:\/\/localhost:9999\/api\/auth\/login ()({correo,password})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "113",
+							"uri": "http://localhost:9999/api/auth/login",
+							"nodeName": "http:\/\/localhost:9999\/api\/auth\/login ()({correo,password})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "401",
+							"otherinfo": ""
+						},
+						{
+							"id": "2",
+							"uri": "http://localhost:9999/api/auth/mfa/activar",
+							"nodeName": "http:\/\/localhost:9999\/api\/auth\/mfa\/activar ()({codigo})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "1316",
+							"uri": "http://localhost:9999/api/auth/mfa/activar/",
+							"nodeName": "http:\/\/localhost:9999\/api\/auth\/mfa\/activar\/ ()({codigo})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "108",
+							"uri": "http://localhost:9999/api/auth/mfa/desactivar",
+							"nodeName": "http:\/\/localhost:9999\/api\/auth\/mfa\/desactivar ()({password,codigo})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "3",
+							"uri": "http://localhost:9999/api/auth/mfa/desactivar",
+							"nodeName": "http:\/\/localhost:9999\/api\/auth\/mfa\/desactivar ()({password,codigo})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "409",
+							"otherinfo": ""
+						},
+						{
+							"id": "1318",
+							"uri": "http://localhost:9999/api/auth/mfa/desactivar/",
+							"nodeName": "http:\/\/localhost:9999\/api\/auth\/mfa\/desactivar\/ ()({password,codigo})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "409",
+							"otherinfo": ""
+						},
+						{
+							"id": "1",
+							"uri": "http://localhost:9999/api/auth/mfa/verificar",
+							"nodeName": "http:\/\/localhost:9999\/api\/auth\/mfa\/verificar ()({mfaToken,codigo})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "34",
+							"uri": "http://localhost:9999/api/auth/mfa/verificar",
+							"nodeName": "http:\/\/localhost:9999\/api\/auth\/mfa\/verificar ()({mfaToken,codigo})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "401",
+							"otherinfo": ""
+						},
+						{
+							"id": "1317",
+							"uri": "http://localhost:9999/api/auth/mfa/verificar/",
+							"nodeName": "http:\/\/localhost:9999\/api\/auth\/mfa\/verificar\/ ()({mfaToken,codigo})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "0",
+							"uri": "http://localhost:9999/api/auth/refresh",
+							"nodeName": "http:\/\/localhost:9999\/api\/auth\/refresh",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "401",
+							"otherinfo": ""
+						},
+						{
+							"id": "1320",
+							"uri": "http://localhost:9999/api/auth/refresh/",
+							"nodeName": "http:\/\/localhost:9999\/api\/auth\/refresh\/",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "401",
+							"otherinfo": ""
+						},
+						{
+							"id": "101",
+							"uri": "http://localhost:9999/api/auth/registro",
+							"nodeName": "http:\/\/localhost:9999\/api\/auth\/registro ()({nombre,correo,password})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "35",
+							"uri": "http://localhost:9999/api/auth/registro",
+							"nodeName": "http:\/\/localhost:9999\/api\/auth\/registro ()({nombre,correo,password})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "409",
+							"otherinfo": ""
+						},
+						{
+							"id": "1319",
+							"uri": "http://localhost:9999/api/auth/registro/",
+							"nodeName": "http:\/\/localhost:9999\/api\/auth\/registro\/ ()({nombre,correo,password})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "409",
+							"otherinfo": ""
+						},
+						{
+							"id": "36",
+							"uri": "http://localhost:9999/api/dominios",
+							"nodeName": "http:\/\/localhost:9999\/api\/dominios ()({nombre})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "85",
+							"uri": "http://localhost:9999/api/dominios",
+							"nodeName": "http:\/\/localhost:9999\/api\/dominios ()({nombre})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "409",
+							"otherinfo": ""
+						},
+						{
+							"id": "1322",
+							"uri": "http://localhost:9999/api/dominios/",
+							"nodeName": "http:\/\/localhost:9999\/api\/dominios\/ ()({nombre})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "409",
+							"otherinfo": ""
+						},
+						{
+							"id": "4",
+							"uri": "http://localhost:9999/api/dominios/42b24948-4af0-4057-88ee-a9518c0c02af/verificar",
+							"nodeName": "http:\/\/localhost:9999\/api\/dominios\/42b24948-4af0-4057-88ee-a9518c0c02af\/verificar",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "422",
+							"otherinfo": ""
+						},
+						{
+							"id": "1334",
+							"uri": "http://localhost:9999/api/dominios/42b24948-4af0-4057-88ee-a9518c0c02af/verificar/",
+							"nodeName": "http:\/\/localhost:9999\/api\/dominios\/42b24948-4af0-4057-88ee-a9518c0c02af\/verificar\/",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "422",
+							"otherinfo": ""
+						}
+					],
+					"count": "52",
+					"systemic": false,
+					"solution": "",
+					"otherinfo": "",
+					"reference": "",
+					"cweid": "388",
+					"wascid": "20",
+					"sourceid": "47"
+				},
+				{
+					"pluginid": "10049",
+					"alertRef": "10049-1",
+					"alert": "Non-Storable Content",
+					"name": "Non-Storable Content",
+					"riskcode": "0",
+					"confidence": "2",
+					"riskdesc": "Informational (Medium)",
+					"desc": "<p>The response contents are not storable by caching components such as proxy servers. If the response does not contain sensitive, personal or user-specific information, it may benefit from being stored and cached, to improve performance.</p>",
+					"instances":[ 
+						{
+							"id": "14",
+							"uri": "http://localhost:9999/api/auth/mfa/desactivar",
+							"nodeName": "http:\/\/localhost:9999\/api\/auth\/mfa\/desactivar ()({password,codigo})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "409",
+							"otherinfo": ""
+						},
+						{
+							"id": "15",
+							"uri": "http://localhost:9999/api/auth/mfa/verificar",
+							"nodeName": "http:\/\/localhost:9999\/api\/auth\/mfa\/verificar ()({mfaToken,codigo})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "16",
+							"uri": "http://localhost:9999/api/auth/refresh",
+							"nodeName": "http:\/\/localhost:9999\/api\/auth\/refresh",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "401",
+							"otherinfo": ""
+						},
+						{
+							"id": "18",
+							"uri": "http://localhost:9999/api/auth/registro",
+							"nodeName": "http:\/\/localhost:9999\/api\/auth\/registro ()({nombre,correo,password})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "201",
+							"otherinfo": ""
+						},
+						{
+							"id": "12",
+							"uri": "http://localhost:9999/api/dominios",
+							"nodeName": "http:\/\/localhost:9999\/api\/dominios ()({nombre})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "201",
+							"otherinfo": ""
+						}
+					],
+					"count": "5",
+					"systemic": true,
+					"solution": "<p>The content may be marked as storable by ensuring that the following conditions are satisfied:</p><p>The request method must be understood by the cache and defined as being cacheable (\"GET\", \"HEAD\", and \"POST\" are currently defined as cacheable)</p><p>The response status code must be understood by the cache (one of the 1XX, 2XX, 3XX, 4XX, or 5XX response classes are generally understood)</p><p>The \"no-store\" cache directive must not appear in the request or response header fields</p><p>For caching by \"shared\" caches such as \"proxy\" caches, the \"private\" response directive must not appear in the response</p><p>For caching by \"shared\" caches such as \"proxy\" caches, the \"Authorization\" header field must not appear in the request, unless the response explicitly allows it (using one of the \"must-revalidate\", \"public\", or \"s-maxage\" Cache-Control response directives)</p><p>In addition to the conditions above, at least one of the following conditions must also be satisfied by the response:</p><p>It must contain an \"Expires\" header field</p><p>It must contain a \"max-age\" response directive</p><p>For \"shared\" caches such as \"proxy\" caches, it must contain a \"s-maxage\" response directive</p><p>It must contain a \"Cache Control Extension\" that allows it to be cached</p><p>It must have a status code that is defined as cacheable by default (200, 203, 204, 206, 300, 301, 404, 405, 410, 414, 501).</p>",
+					"otherinfo": "",
+					"reference": "<p>https://datatracker.ietf.org/doc/html/rfc7234</p><p>https://datatracker.ietf.org/doc/html/rfc7231</p><p>https://www.w3.org/Protocols/rfc2616/rfc2616-sec13.html</p>",
+					"cweid": "524",
+					"wascid": "13",
+					"sourceid": "13"
+				},
+				{
+					"pluginid": "10112",
+					"alertRef": "10112",
+					"alert": "Session Management Response Identified",
+					"name": "Session Management Response Identified",
+					"riskcode": "0",
+					"confidence": "2",
+					"riskdesc": "Informational (Medium)",
+					"desc": "<p>The given response has been identified as containing a session management token. The 'Other Info' field contains a set of header tokens that can be used in the Header Based Session Management Method. If the request is in a context which has a Session Management Method set to \"Auto-Detect\" then this rule will change the session management to use the tokens identified.</p>",
+					"instances":[ 
+						{
+							"id": "6",
+							"uri": "http://localhost:9999/api/auth/login",
+							"nodeName": "http:\/\/localhost:9999\/api\/auth\/login ()({correo,password})",
+							"method": "POST",
+							"param": "token",
+							"attack": "",
+							"evidence": "token",
+							"otherinfo": "json:token\ncookie:ds_refresh"
+						},
+						{
+							"id": "5",
+							"uri": "http://localhost:9999/api/auth/registro",
+							"nodeName": "http:\/\/localhost:9999\/api\/auth\/registro ()({nombre,correo,password})",
+							"method": "POST",
+							"param": "token",
+							"attack": "",
+							"evidence": "token",
+							"otherinfo": "json:token\ncookie:ds_refresh"
+						}
+					],
+					"count": "2",
+					"systemic": false,
+					"solution": "<p>This is an informational alert rather than a vulnerability and so there is nothing to fix.</p>",
+					"otherinfo": "<p>json:token</p><p>cookie:ds_refresh</p>",
+					"reference": "<p>https://www.zaproxy.org/docs/desktop/addons/authentication-helper/session-mgmt-id/</p>",
+					"cweid": "-1",
+					"wascid": "-1",
+					"sourceid": "6"
+				},
+				{
+					"pluginid": "10049",
+					"alertRef": "10049-3",
+					"alert": "Storable and Cacheable Content",
+					"name": "Storable and Cacheable Content",
+					"riskcode": "0",
+					"confidence": "2",
+					"riskdesc": "Informational (Medium)",
+					"desc": "<p>The response contents are storable by caching components such as proxy servers, and may be retrieved directly from the cache, rather than from the origin server by the caching servers, in response to similar requests from other users. If the response data is sensitive, personal or user-specific, this may result in sensitive information being leaked. In some cases, this may even result in a user gaining complete control of the session of another user, depending on the configuration of the caching components in use in their environment. This is primarily an issue where \"shared\" caching servers such as \"proxy\" caches are configured on the local network. This configuration is typically found in corporate or educational environments, for instance.</p>",
+					"instances":[ 
+						{
+							"id": "17",
+							"uri": "http://localhost:9999/api/dominios",
+							"nodeName": "http:\/\/localhost:9999\/api\/dominios",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "",
+							"otherinfo": "In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234."
+						},
+						{
+							"id": "9",
+							"uri": "http://localhost:9999/api/dominios/42b24948-4af0-4057-88ee-a9518c0c02af/verificacion",
+							"nodeName": "http:\/\/localhost:9999\/api\/dominios\/42b24948-4af0-4057-88ee-a9518c0c02af\/verificacion",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "",
+							"otherinfo": "In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234."
+						},
+						{
+							"id": "8",
+							"uri": "http://localhost:9999/api/auth/login",
+							"nodeName": "http:\/\/localhost:9999\/api\/auth\/login ()({correo,password})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "",
+							"otherinfo": "In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234."
+						},
+						{
+							"id": "10",
+							"uri": "http://localhost:9999/api/auth/logout",
+							"nodeName": "http:\/\/localhost:9999\/api\/auth\/logout",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "",
+							"otherinfo": "In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234."
+						},
+						{
+							"id": "11",
+							"uri": "http://localhost:9999/api/auth/mfa/configurar",
+							"nodeName": "http:\/\/localhost:9999\/api\/auth\/mfa\/configurar",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "",
+							"otherinfo": "In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234."
+						}
+					],
+					"count": "5",
+					"systemic": true,
+					"solution": "<p>Validate that the response does not contain sensitive, personal or user-specific information. If it does, consider the use of the following HTTP response headers, to limit, or prevent the content being stored and retrieved from the cache by another user:</p><p>Cache-Control: no-cache, no-store, must-revalidate, private</p><p>Pragma: no-cache</p><p>Expires: 0</p><p>This configuration directs both HTTP 1.0 and HTTP 1.1 compliant caching servers to not store the response, and to not retrieve the response (without validation) from the cache, in response to a similar request.</p>",
+					"otherinfo": "<p>In the absence of an explicitly specified caching lifetime directive in the response, a liberal lifetime heuristic of 1 year was assumed. This is permitted by rfc7234.</p>",
+					"reference": "<p>https://datatracker.ietf.org/doc/html/rfc7234</p><p>https://datatracker.ietf.org/doc/html/rfc7231</p><p>https://www.w3.org/Protocols/rfc2616/rfc2616-sec13.html</p>",
+					"cweid": "524",
+					"wascid": "13",
+					"sourceid": "14"
+				}
+			]
+		}
+	],
+	"sequences":[
+	]
+
+}
