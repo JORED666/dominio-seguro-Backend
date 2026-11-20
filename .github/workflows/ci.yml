@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+permissions:
+  contents: read
+
+jobs:
+  pruebas:
+    name: Pruebas unitarias
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Validar esquema de Prisma
+        run: npx prisma validate
+        env:
+          DATABASE_URL: postgresql://usuario:clave@localhost:5432/prueba
+      - run: npm test
+
+  auditoria:
+    name: Auditoría de dependencias
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      # effect (usado por el CLI de Prisma) se fuerza a una versión corregida con "overrides";
+      # npm sigue marcando a prisma por el rango que declara, por eso el umbral es critical.
+      - run: npm audit --omit=dev --audit-level=critical
+
+  semgrep:
+    name: Análisis estático (Semgrep)
+    runs-on: ubuntu-latest
+    container:
+      image: semgrep/semgrep
+    steps:
+      - uses: actions/checkout@v4
+      - run: semgrep scan --config p/javascript --config p/nodejs --config p/owasp-top-ten --exclude node_modules --exclude docs --error
+
+  imagen:
+    name: Construcción de la imagen Docker
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t dominio-seguro-backend .

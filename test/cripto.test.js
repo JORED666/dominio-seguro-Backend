@@ -88,3 +88,9 @@ test("TOTP: la URI otpauth lleva emisor, cuenta y secreto", () => {
   assert.ok(uri.includes("secret=ABC234"));
   assert.ok(uri.includes("issuer=Dominio%20Seguro"));
 });
+
+test("AES-256-GCM: rechaza una etiqueta de autenticación más corta de lo esperado", () => {
+  const partes = cifrar("secreto").split(":");
+  partes[2] = Buffer.from(partes[2], "base64").subarray(0, 8).toString("base64");
+  assert.throws(() => descifrar(partes.join(":")));
+});
