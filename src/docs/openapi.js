@@ -66,6 +66,24 @@ export const especificacion = {
     "/api/auth/logout": {
       post: { tags: ["Autenticación"], summary: "Cerrar sesión (revoca los tokens de refresco)", responses: { 204: { description: "Sesión cerrada" } } },
     },
+    "/api/auth/olvide": {
+      post: {
+        tags: ["Autenticación"],
+        summary: "Pedir un enlace para restablecer la contraseña",
+        description: "Responde siempre lo mismo, exista o no el correo, para no revelar qué cuentas existen. El enlace llega por correo, vale 30 minutos y sirve una sola vez.",
+        requestBody: cuerpo("Olvide"),
+        responses: { 202: ok("Solicitud recibida", "Mensaje"), 400: error("Datos inválidos"), 429: error("Demasiados intentos") },
+      },
+    },
+    "/api/auth/restablecer": {
+      post: {
+        tags: ["Autenticación"],
+        summary: "Cambiar la contraseña con el enlace recibido por correo",
+        description: "Gasta el enlace, guarda la nueva contraseña (argon2id) y cierra todas las sesiones abiertas de la cuenta.",
+        requestBody: cuerpo("Restablecer"),
+        responses: { 200: ok("Contraseña actualizada", "Mensaje"), 400: error("Datos inválidos, o enlace inválido, usado o expirado"), 429: error("Demasiados intentos") },
+      },
+    },
     "/api/auth/mfa/verificar": {
       post: {
         tags: ["Autenticación"],
@@ -198,6 +216,13 @@ export const especificacion = {
       MfaDesactivar: { type: "object", required: ["password", "codigo"], properties: { password: cadena, codigo: { type: "string", pattern: "^\\d{6}$" } } },
       MfaConfiguracion: { type: "object", properties: { secreto: { type: "string", description: "Clave en base32 para escribirla a mano" }, otpauth: cadena, qr: { type: "string", description: "Imagen PNG en data URL" } } },
       MfaEstado: { type: "object", properties: { mfaActivo: { type: "boolean" } } },
+      Olvide: { type: "object", required: ["correo"], properties: { correo: { type: "string", format: "email" } } },
+      Restablecer: {
+        type: "object",
+        required: ["token", "password"],
+        properties: { token: { type: "string", description: "Valor del parámetro token del enlace recibido por correo" }, password: { type: "string", minLength: 12, maxLength: 128 } },
+      },
+      Mensaje: { type: "object", properties: { mensaje: cadena } },
       NuevoDominio: { type: "object", required: ["nombre"], properties: { nombre: { type: "string", example: "mitienda.mx" } } },
       Dominio: {
         type: "object",
