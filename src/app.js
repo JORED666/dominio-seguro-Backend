@@ -11,6 +11,7 @@ import { manejadorErrores } from "./middleware/manejador-errores.js";
 
 // Arma la aplicación Express (sin escuchar en un puerto, para poder probarla)
 export const app = express();
+app.set("trust proxy", Number(process.env.TRUST_PROXY) || 0);
 app.use(helmet());
 // credentials: true permite que el navegador envíe la cookie del token de refresco
 app.use(cors({ origin: process.env.CORS_ORIGIN || "http://localhost:4200", credentials: true }));
