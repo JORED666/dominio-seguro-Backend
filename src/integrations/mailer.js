@@ -28,7 +28,26 @@ async function obtenerTransporte() {
   return transporte;
 }
 
+// Resend envía por HTTPS (puerto 443): sirve donde el SMTP está bloqueado, como en el plan gratuito de Railway
+async function enviarConResend({ para, asunto, texto, html }) {
+  const res = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      from: process.env.CORREO_DE || "Dominio Seguro <onboarding@resend.dev>",
+      to: [para],
+      subject: asunto,
+      text: texto,
+      html,
+    }),
+    signal: AbortSignal.timeout(10_000),
+  });
+  if (!res.ok) throw new Error(`Resend respondió ${res.status}`);
+  return res.json();
+}
+
 export async function enviarCorreo({ para, asunto, texto, html }) {
+  if (process.env.RESEND_API_KEY) return enviarConResend({ para, asunto, texto, html });
   const info = await (await obtenerTransporte()).sendMail({
     from: process.env.CORREO_DE || "Dominio Seguro <alertas@dominio-seguro.local>",
     to: para,
