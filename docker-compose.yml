@@ -1,13 +1,57 @@
+name: dominio-seguro
 services:
   db:
     image: postgres:16
+    restart: unless-stopped
     environment:
       POSTGRES_USER: dominio
-      POSTGRES_PASSWORD: dominio_dev
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Define POSTGRES_PASSWORD en .env}
       POSTGRES_DB: dominio_seguro
     ports:
-      - "5433:5432"
+      - "127.0.0.1:5433:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dominio -d dominio_seguro"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  backend:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      NODE_ENV: production
+      PORT: "3001"
+      DATABASE_URL: postgresql://dominio:${POSTGRES_PASSWORD}@db:5432/dominio_seguro
+      CORS_ORIGIN: ${ORIGEN_PUBLICO:-http://localhost:8080}
+      PANEL_URL: ${ORIGEN_PUBLICO:-http://localhost:8080}
+      IPSCORE_URL: ${IPSCORE_URL_DOCKER:-http://host.docker.internal:8000}
+      TRUST_PROXY: "1"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      db:
+        condition: service_healthy
+    expose:
+      - "3001"
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+
+  frontend:
+    build:
+      context: ${FRONTEND_CONTEXT:-https://github.com/JORED666/dominio-seguro-Frontend.git#develop}
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    depends_on:
+      backend:
+        condition: service_healthy
+    security_opt:
+      - no-new-privileges:true
+
 volumes:
   pgdata:
