@@ -16,6 +16,7 @@ model Usuario {
   mfaSecreto        String?                 @map("mfa_secreto")
   mfaActivo         Boolean                 @default(false) @map("mfa_activo")
   mfaUltimoPaso     Int?                    @map("mfa_ultimo_paso")
+  googleId          String?                 @unique @map("google_id")
   creadoEn          DateTime                @default(now()) @map("creado_en")
   dominios          Dominio[]
   refrescos         TokenRefresco[]
