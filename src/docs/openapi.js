@@ -84,6 +84,22 @@ export const especificacion = {
         responses: { 200: ok("Contraseña actualizada", "Mensaje"), 400: error("Datos inválidos, o enlace inválido, usado o expirado"), 429: error("Demasiados intentos") },
       },
     },
+    "/api/auth/google": {
+      get: {
+        tags: ["Autenticación"],
+        summary: "Iniciar sesión con Google (OAuth 2.0 / OpenID Connect)",
+        description: "Redirige a Google con `state`, `nonce` y PKCE (S256). Guarda esos valores en la cookie `ds_oauth` (HttpOnly, SameSite=Lax, 10 minutos). Se abre desde el navegador, no desde Swagger.",
+        responses: { 302: { description: "Redirección a la pantalla de acceso de Google" } },
+      },
+    },
+    "/api/auth/google/callback": {
+      get: {
+        tags: ["Autenticación"],
+        summary: "Regreso desde Google",
+        description: "Comprueba el `state` contra la cookie, canjea el código con el verificador PKCE y valida el token de identidad (emisor, audiencia, vencimiento, nonce y correo verificado). Crea la cuenta o la vincula por correo (al vincular se anula la contraseña anterior y se cierran sus sesiones), deja la cookie `ds_refresh` y redirige a `/acceso/google`. Si algo falla redirige a `/login?error=google`. Google ya autenticó a la persona, por eso no se pide el código TOTP local.",
+        responses: { 302: { description: "Redirección al panel (éxito) o a /login?error=google (fallo)" } },
+      },
+    },
     "/api/auth/mfa/verificar": {
       post: {
         tags: ["Autenticación"],
