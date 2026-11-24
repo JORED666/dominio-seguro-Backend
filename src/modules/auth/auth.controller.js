@@ -3,10 +3,10 @@ import { validar } from "../../lib/validar.js";
 import { loginSchema, olvideSchema, registroSchema, restablecerSchema } from "./auth.schemas.js";
 import * as servicio from "./auth.service.js";
 
-const COOKIE = "ds_refresh";
+export const COOKIE = "ds_refresh";
 
 // El token de refresco viaja en una cookie httpOnly: el JavaScript de la página no puede leerlo
-const opcionesCookie = () => ({
+export const opcionesCookie = () => ({
   httpOnly: true,
   sameSite: "strict",
   secure: process.env.NODE_ENV === "production",

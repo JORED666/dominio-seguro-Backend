@@ -53,3 +53,16 @@ export function aplicarRestablecimiento({ id, usuarioId, passwordHash }) {
     return true;
   });
 }
+
+// Inicio de sesión con Google
+export const buscarPorGoogleId = (googleId) => prisma.usuario.findUnique({ where: { googleId } });
+
+// Vincula Google a una cuenta que ya existía: cambia su contraseña por una desconocida y cierra sus sesiones
+export function vincularGoogle({ id, googleId, passwordHash }) {
+  return prisma.$transaction(async (tx) => {
+    const usuario = await tx.usuario.update({ where: { id }, data: { googleId, passwordHash } });
+    await tx.tokenRefresco.deleteMany({ where: { usuarioId: id } });
+    await tx.tokenRestablecimiento.deleteMany({ where: { usuarioId: id } });
+    return usuario;
+  });
+}
