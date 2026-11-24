@@ -1,5 +1,5 @@
 import argon2 from "argon2";
-import { randomUUID } from "node:crypto";
+import { randomBytes, randomUUID } from "node:crypto";
 import jwt from "jsonwebtoken";
 import { ErrorHttp } from "../../lib/errores.js";
 import { hashToken, nuevoTokenRefresco } from "../../lib/tokens.js";
@@ -139,4 +139,22 @@ export async function restablecerPassword({ token, password }) {
       texto: "Se cambió la contraseña de tu cuenta y se cerraron todas tus sesiones. Si no fuiste tú, restablécela de nuevo y activa la verificación en dos pasos.",
     }).catch(() => {});
   }
+}
+
+// ---- Inicio de sesión con Google ----
+// Google ya autenticó a la persona (y marcó su correo como verificado): no se pide el segundo factor local
+export async function iniciarSesionConGoogle({ sub, correo, nombre }) {
+  let usuario = await repo.buscarPorGoogleId(sub);
+  if (!usuario) {
+    // Contraseña aleatoria que nadie conoce: la columna es obligatoria y así no hay login por contraseña
+    const passwordHash = await argon2.hash(randomBytes(32).toString("hex"), { type: argon2.argon2id });
+    const existente = await repo.buscarPorCorreo(correo);
+    if (existente) {
+      // El registro no verifica el correo: al vincular se anula la contraseña anterior y se cierran sus sesiones
+      usuario = await repo.vincularGoogle({ id: existente.id, googleId: sub, passwordHash });
+    } else {
+      usuario = await repo.crear({ nombre: nombre || correo.split("@")[0], correo, passwordHash, googleId: sub });
+    }
+  }
+  return crearSesion(usuario);
 }
