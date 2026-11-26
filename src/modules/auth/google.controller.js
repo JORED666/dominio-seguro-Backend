@@ -52,7 +52,12 @@ export async function callback(req, res) {
 
   try {
     const perfil = await google.canjearCodigo({ code, verifier: guardado.verifier, nonce: guardado.nonce });
-    const { refresco } = await servicio.iniciarSesionConGoogle(perfil);
+    const resultado = await servicio.iniciarSesionConGoogle(perfil);
+    if (resultado.mfaRequerido) {
+      // Sin sesión todavía: el token de verificación viaja en el fragmento (#), que no llega a ningún servidor
+      return res.redirect(`${panel()}/acceso/google#mfa=${encodeURIComponent(resultado.mfaToken)}`);
+    }
+    const { refresco } = resultado;
     res.cookie(COOKIE, refresco, { ...opcionesCookie(), maxAge: servicio.DURACION_REFRESCO_MS });
     res.redirect(`${panel()}/acceso/google`);
   } catch (e) {

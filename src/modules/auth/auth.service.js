@@ -142,7 +142,7 @@ export async function restablecerPassword({ token, password }) {
 }
 
 // ---- Inicio de sesión con Google ----
-// Google ya autenticó a la persona (y marcó su correo como verificado): no se pide el segundo factor local
+// Google autentica a la persona y marca su correo como verificado, pero NO sustituye el segundo factor local
 export async function iniciarSesionConGoogle({ sub, correo, nombre }) {
   let usuario = await repo.buscarPorGoogleId(sub);
   if (!usuario) {
@@ -156,5 +156,7 @@ export async function iniciarSesionConGoogle({ sub, correo, nombre }) {
       usuario = await repo.crear({ nombre: nombre || correo.split("@")[0], correo, passwordHash, googleId: sub });
     }
   }
+  // Si la cuenta tiene verificación en dos pasos, se pide el código TOTP igual que en el login normal
+  if (usuario.mfaActivo) return { mfaRequerido: true, mfaToken: firmarTokenMfa(usuario) };
   return crearSesion(usuario);
 }
